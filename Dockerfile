@@ -4,5 +4,4 @@ ENV APP_JAR_FILE=testspringboot-0.0.1-SNAPSHOT.jar
 WORKDIR ${APP_HOME}
 COPY ./build/libs/${APP_JAR_FILE} /app.jar
 EXPOSE 8080
-ENTRYPOINT ["java","-jar","/app.jar"]
-CMD java -Dserver.port=$PORT -jar /app.jar
+CMD java -jar /app.jar
