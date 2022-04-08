@@ -18,4 +18,9 @@ public class TestspringbootApplication {
 		return "Hello Spring boot";
 	}
 
+	@GetMapping("/version")
+	public String version() {
+		return "The current version is 0.0.1";
+	}
+
 }
