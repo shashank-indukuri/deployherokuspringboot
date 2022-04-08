@@ -23,7 +23,7 @@ class TestspringbootApplicationTests {
 
     @Test
     void version() {
-        assertEquals( "The current version is 0.0.1", testspringbootApplication.version());
+        assertEquals( "The current version is 0.0.2", testspringbootApplication.version());
     }
 
 }
