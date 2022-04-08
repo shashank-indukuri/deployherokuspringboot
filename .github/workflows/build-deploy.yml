@@ -31,9 +31,23 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           #Set artifact name
-          name: build-artifact
+          name: testspringboot-0.0.1-SNAPSHOT.jar
           #From this paths
           path: build/libs/testspringboot-0.0.1-SNAPSHOT.jar
+    deploy:
+    #Depends on build's job
+    needs: build
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      #Download JAR file
+      - name: Download JAR
+        #Download the artifact which was uploaded in the build's job
+        uses: actions/download-artifact@v3
+        with:
+          name: testspringboot-0.0.1-SNAPSHOT.jar
+          path: build/libs/
+      - uses: actions/checkout@v3
       - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
