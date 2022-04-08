@@ -6,6 +6,35 @@ on:
       - main
 
 jobs:
+  #Test's job
+  tests:
+    name: Unit tests
+    #Run on Ubuntu os using the latest version
+    runs-on: ubuntu-latest
+    #Job's steps
+    steps:
+      #Check-out your repository under $GITHUB_WORKSPACE, so your workflow can access it
+      - uses: actions/checkout@v3
+      #Set up JDK 17
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+      #Cache Gradle
+      - name: Cache Gradle packages
+        #This action allows caching dependencies and build outputs to improve workflow execution time.
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: ${{ runner.os }}-gradle-
+      #Run Tests
+      - name: Run Tests
+        run: ./gradlew check
+
   #Build's job
   build:
     name: Build
@@ -34,6 +63,8 @@ jobs:
           name: testspringboot-0.0.1-SNAPSHOT.jar
           #From this paths
           path: build/libs/testspringboot-0.0.1-SNAPSHOT.jar
+
+  #Deploy's Job
   deploy:
     #Depends on build's job
     needs: build
