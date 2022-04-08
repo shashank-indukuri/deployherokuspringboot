@@ -20,7 +20,7 @@ public class TestspringbootApplication {
 
 	@GetMapping("/version")
 	public String version() {
-		return "The current version is 0.0.1";
+		return "The current version is 0.0.2";
 	}
 
 }
