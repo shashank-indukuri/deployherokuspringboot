@@ -16,7 +16,7 @@ public class TestspringbootApplication {
 
 	@GetMapping
 	public String welcome() {
-		return "Hello Spring";
+		return "Hello Spring Boot Test";
 	}
 
 	@GetMapping("/version")
