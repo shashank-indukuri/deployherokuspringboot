@@ -18,7 +18,7 @@ class TestspringbootApplicationTests {
 
 	@Test
 	void welcome() {
-        assertEquals( "Hello Spring Boot Test", testspringbootApplication.welcome());
+        assertEquals( "Hello Spring Boot Test. Welcome to GitHub Actions.", testspringbootApplication.welcome());
     }
 
     @Test

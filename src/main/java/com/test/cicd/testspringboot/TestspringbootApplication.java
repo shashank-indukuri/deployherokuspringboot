@@ -16,17 +16,11 @@ public class TestspringbootApplication {
 
 	@GetMapping
 	public String welcome() {
-		return "Hello Spring Boot Test";
+		return "Hello Spring Boot Test. Welcome to GitHub Actions.";
 	}
 
 	@GetMapping("/version")
 	public String version() {
 		return "The current version is 0.0.2";
 	}
-
-	@Bean
-	public void display(){
-		System.out.println("Hello world");
-	}
-
 }
