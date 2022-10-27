@@ -3,5 +3,5 @@ ENV APP_HOME=/app
 ENV APP_JAR_FILE=testspringboot-0.0.1-SNAPSHOT.jar
 WORKDIR ${APP_HOME}
 COPY ./build/libs/${APP_JAR_FILE} /app.jar
-EXPOSE 8080
+EXPOSE 80
 CMD java -jar -Dserver.port=$PORT /app.jar
