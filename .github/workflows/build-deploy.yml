@@ -1,9 +1,16 @@
 name: Build-Deploy
 
+env:
+  AZURE_WEBAPP_NAME: docker-deployment # set this to your application's name
+
 on:
   push:
     branches:
       - main
+
+permissions:
+  contents: "read"
+  packages: "write"
 
 jobs:
   #Build's job
@@ -14,45 +21,43 @@ jobs:
     steps:
       #Check-out your repository under $GITHUB_WORKSPACE, so your workflow can access it
       - uses: actions/checkout@v3
-      #Set up JDK 17
-      - name: Setup Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: "temurin"
-          java-version: "17"
-      # Build the application with Gradle
-      - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
-      #Upload the build file
-      - name: Upload JAR
-        #This uploads artifacts from your workflow allowing you to share data between jobs and store data once a workflow is complete.
-        uses: actions/upload-artifact@v3
-        with:
-          #Set artifact name
-          name: testspringboot-0.0.1-SNAPSHOT.jar
-          #From this paths
-          path: build/libs/testspringboot-0.0.1-SNAPSHOT.jar
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
 
-  #Deploy's Job
+      - name: Log in to GitHub container registry
+        uses: docker/login-action@v1.10.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Lowercase the repo name
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
+      - name: Build and push container image to registry
+        uses: docker/build-push-action@v2
+        with:
+          push: true
+          tags: ghcr.io/${{ env.REPO }}:${{ github.sha }}
+          file: ./Dockerfile
+
   deploy:
-    #Depends on build's job
-    needs: build
-    name: Deploy
     runs-on: ubuntu-latest
+
+    needs: build
+
+    environment:
+      name: "production"
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+
     steps:
-      - uses: actions/checkout@v3
-      #Download JAR file
-      - name: Download JAR
-        #Download the artifact which was uploaded in the build's job
-        uses: actions/download-artifact@v3
+      - name: Lowercase the repo name
+        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@0b651ed7546ecfc75024011f76944cb9b381ef1e
         with:
-          name: testspringboot-0.0.1-SNAPSHOT.jar
-          path: build/libs/
-      - uses: akhileshns/heroku-deploy@v3.12.12 # This is the action
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME}} #Must be unique in Heroku
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
-          usedocker: true
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          images: "ghcr.io/${{ env.REPO }}:${{ github.sha }}"
